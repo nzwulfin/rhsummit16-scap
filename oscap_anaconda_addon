@@ -1,0 +1,18 @@
+<% if @host.policies_enc != '[]' %>
+<%
+  pol_array = @host.policies_enc.split(',')
+  pol_hash = {}
+  pol_array.each do |e|
+    e.gsub! /"/, ''
+    key_val = e.split(':')
+    pol_hash[key_val[0]] = key_val[1]
+  end
+%>
+
+%addon org_fedora_oscap
+    content-type = datastream
+    content-url = http://<%= @host.puppetmaster %><%= @host.params['scap_download_path'] %>
+    profile = <%= pol_hash['profile_id'] %>
+%end
+
+<% end %>

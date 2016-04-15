@@ -1,0 +1,32 @@
+# Initialize (format) all disks (optional)
+zerombr
+
+# The following partition layout scheme assumes disk of size 20GB or larger
+# Modify size of partitions appropriately to reflect actual machine's hardware
+#
+# Remove Linux partitions from the system prior to creating new ones (optional)
+# --linux	erase all Linux partitions
+# --initlabel	initialize the disk label to the default based on the underlying architecture
+clearpart --all --initlabel
+#autopart --type=lvm
+
+part /boot --fstype ext3 --size=512
+part pv.01 --size=1 --grow
+
+# Create a Logical Volume Management (LVM) group (optional)
+# Total size must be 8GiB+
+volgroup VolGroup --pesize=4096 pv.01
+
+# Create particular logical volumes (optional)
+logvol / --fstype=xfs --name=LogVol06 --vgname=VolGroup --size=2048 --grow
+# CCE-26557-9: Ensure /home Located On Separate Partition
+logvol /home --fstype=xfs --name=LogVol02 --vgname=VolGroup --size=1024 --fsoptions="nodev"
+# CCE-26435-8: Ensure /tmp Located On Separate Partition
+logvol /tmp --fstype=xfs --name=LogVol01 --vgname=VolGroup --size=1024 --fsoptions="nodev,noexec,nosuid"
+# CCE-26639-5: Ensure /var Located On Separate Partition
+logvol /var --fstype=xfs --name=LogVol03 --vgname=VolGroup --size=1024 --fsoptions="nodev"
+# CCE-26215-4: Ensure /var/log Located On Separate Partition
+logvol /var/log --fstype=xfs --name=LogVol04 --vgname=VolGroup --size=1024 --fsoptions="nodev"
+# CCE-26436-6: Ensure /var/log/audit Located On Separate Partition
+logvol /var/log/audit --fstype=xfs --name=LogVol05 --vgname=VolGroup --size=512 --fsoptions="nodev"
+logvol swap --name=lv_swap --vgname=VolGroup --size=512
