@@ -7,3 +7,5 @@ Upload PCI_SCAP_ptable as new partition table
 
 Copy the uploaded DataStream to /var/www/html/pub on Satellite
 * Can't pull from uploaded policy during kickstart, no signed puppet client cert
+
+Host to kickstart must be added to host group associated with SCAP content
